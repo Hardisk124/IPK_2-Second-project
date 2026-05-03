@@ -2,15 +2,6 @@
 
 Implementácia prenosu jedného súvislého byte streamu nad UDP podľa zadania IPK2. Projekt obsahuje jediný binárny program `ipk-rdt`, ktorý vie fungovať ako klient aj server a realizuje vlastný spoľahlivý transportný protokol inšpirovaný TCP (Go-Back-N).
 
-## Prehľad funkcií
-- klient aj server v jednom binárnom súbore (`-c` / `-s`)
-- spoľahlivý a usporiadaný prenos nad UDP (IPv4 aj IPv6)
-- podpora `stdin`/`stdout` aj súborov
-- Go-Back-N s oknom 16 segmentov
-- kontrolný súčet (ones’ complement) nad hlavičkou aj payloadom
-- ošetrenie duplicitných a poškodených paketov
-- korektné ukončenie prenosu (FIN/ACK)
-
 ## Build
 
 ```sh
