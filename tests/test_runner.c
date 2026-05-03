@@ -668,6 +668,189 @@ static int test_stdin_stdout(void)
     return rc;
 }
 
+static int test_stdin_to_file(void)
+{
+    char *tmpdir = make_temp_dir();
+    if (!tmpdir) {
+        return 1;
+    }
+
+    char *output_path = path_join(tmpdir, "output.bin");
+    size_t data_len = TEST_DATA_SIZE_MEDIUM;
+    uint8_t *data = malloc(data_len);
+    if (!output_path || !data) {
+        free(tmpdir);
+        free(output_path);
+        free(data);
+        return 1;
+    }
+    fill_random(data, data_len);
+
+    int port = pick_port();
+    char port_buf[16];
+    snprintf(port_buf, sizeof(port_buf), "%d", port);
+
+    ChildProcess server = start_server("127.0.0.1", port_buf, output_path, DEFAULT_TIMEOUT_SEC, false);
+    if (server.pid < 0) {
+        log_msg("Server failed to start\n");
+        free(tmpdir);
+        free(output_path);
+        free(data);
+        return 1;
+    }
+
+    ChildProcess client = start_client("127.0.0.1", port_buf, NULL, DEFAULT_TIMEOUT_SEC, true);
+    if (client.pid < 0) {
+        terminate_process(server.pid);
+        free(tmpdir);
+        free(output_path);
+        free(data);
+        return 1;
+    }
+
+    if (write_all(client.stdin_fd, data, data_len) < 0) {
+        log_msg("Failed to write to client stdin\n");
+        terminate_process(server.pid);
+        terminate_process(client.pid);
+        close(client.stdin_fd);
+        free(tmpdir);
+        free(output_path);
+        free(data);
+        return 1;
+    }
+    close(client.stdin_fd);
+    client.stdin_fd = -1;
+
+    int client_exit = 0;
+    if (wait_process(client.pid, TEST_TIMEOUT_MS, &client_exit) < 0 || client_exit != 0) {
+        terminate_process(server.pid);
+        free(tmpdir);
+        free(output_path);
+        free(data);
+        return 1;
+    }
+
+    int server_exit = 0;
+    if (wait_process(server.pid, TEST_TIMEOUT_MS, &server_exit) < 0 || server_exit != 0) {
+        free(tmpdir);
+        free(output_path);
+        free(data);
+        return 1;
+    }
+
+    size_t out_len = 0;
+    uint8_t *out_buf = read_file(output_path, &out_len);
+    if (!out_buf) {
+        free(tmpdir);
+        free(output_path);
+        free(data);
+        return 1;
+    }
+
+    int rc = 0;
+    if (out_len != data_len || memcmp(out_buf, data, data_len) != 0) {
+        log_msg("stdin/file data mismatch\n");
+        rc = 1;
+    }
+    free(out_buf);
+    free(tmpdir);
+    free(output_path);
+    free(data);
+    return rc;
+}
+
+static int test_file_to_stdout(void)
+{
+    char *tmpdir = make_temp_dir();
+    if (!tmpdir) {
+        return 1;
+    }
+
+    char *input_path = path_join(tmpdir, "input.bin");
+    size_t data_len = TEST_DATA_SIZE_MEDIUM;
+    uint8_t *data = malloc(data_len);
+    if (!input_path || !data) {
+        free(tmpdir);
+        free(input_path);
+        free(data);
+        return 1;
+    }
+    fill_random(data, data_len);
+    if (write_file(input_path, data, data_len) < 0) {
+        free(tmpdir);
+        free(input_path);
+        free(data);
+        return 1;
+    }
+
+    int port = pick_port();
+    char port_buf[16];
+    snprintf(port_buf, sizeof(port_buf), "%d", port);
+
+    ChildProcess server = start_server("127.0.0.1", port_buf, NULL, DEFAULT_TIMEOUT_SEC, true);
+    if (server.pid < 0) {
+        log_msg("Server failed to start\n");
+        free(tmpdir);
+        free(input_path);
+        free(data);
+        return 1;
+    }
+
+    ChildProcess client = start_client("127.0.0.1", port_buf, input_path, DEFAULT_TIMEOUT_SEC, false);
+    if (client.pid < 0) {
+        terminate_process(server.pid);
+        free(tmpdir);
+        free(input_path);
+        free(data);
+        return 1;
+    }
+
+    int client_exit = 0;
+    if (wait_process(client.pid, TEST_TIMEOUT_MS, &client_exit) < 0 || client_exit != 0) {
+        terminate_process(server.pid);
+        if (server.stdout_fd != -1) {
+            close(server.stdout_fd);
+        }
+        free(tmpdir);
+        free(input_path);
+        free(data);
+        return 1;
+    }
+
+    int server_exit = 0;
+    if (wait_process(server.pid, TEST_TIMEOUT_MS, &server_exit) < 0 || server_exit != 0) {
+        if (server.stdout_fd != -1) {
+            close(server.stdout_fd);
+        }
+        free(tmpdir);
+        free(input_path);
+        free(data);
+        return 1;
+    }
+
+    uint8_t *out_buf = NULL;
+    size_t out_len = 0;
+    if (read_all(server.stdout_fd, &out_buf, &out_len) < 0) {
+        close(server.stdout_fd);
+        free(tmpdir);
+        free(input_path);
+        free(data);
+        return 1;
+    }
+    close(server.stdout_fd);
+
+    int rc = 0;
+    if (out_len != data_len || memcmp(out_buf, data, data_len) != 0) {
+        log_msg("file/stdout data mismatch\n");
+        rc = 1;
+    }
+    free(out_buf);
+    free(tmpdir);
+    free(input_path);
+    free(data);
+    return rc;
+}
+
 static int test_empty_input(void)
 {
     char *tmpdir = make_temp_dir();
@@ -1271,6 +1454,12 @@ int main(int argc, char **argv)
     }
     if (strcmp(argv[1], "stdin_stdout_transfer") == 0) {
         return test_stdin_stdout();
+    }
+    if (strcmp(argv[1], "stdin_to_file_transfer") == 0) {
+        return test_stdin_to_file();
+    }
+    if (strcmp(argv[1], "file_to_stdout_transfer") == 0) {
+        return test_file_to_stdout();
     }
     if (strcmp(argv[1], "empty_input_transfer") == 0) {
         return test_empty_input();

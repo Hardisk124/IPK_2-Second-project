@@ -109,7 +109,7 @@ int server(const Args *args){
     while(state != SER_DONE && !stop && !err_occurred){
 
         if (state != LISTEN && now_ms() - last_progress > args->timeout * 1000){
-            fprintf(stderr, "ERROR: timeout, no progress for %d ms\n", args->timeout);
+            fprintf(stderr, "timeout, no progress for %d s\n", args->timeout);
             err_occurred = true;
             break;
         }

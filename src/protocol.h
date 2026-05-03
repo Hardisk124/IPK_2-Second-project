@@ -53,6 +53,7 @@ typedef struct {
     const char *input_path;
     const char *output_path;
     int timeout;
+    bool is_client;
 }Args;
 
 typedef enum{

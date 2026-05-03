@@ -34,6 +34,8 @@ endfunction()
 
 add_ipk_test(basic_file_transfer basic_file_transfer)
 add_ipk_test(stdin_stdout_transfer stdin_stdout_transfer)
+add_ipk_test(stdin_to_file_transfer stdin_to_file_transfer)
+add_ipk_test(file_to_stdout_transfer file_to_stdout_transfer)
 add_ipk_test(empty_input_transfer empty_input_transfer)
 add_ipk_test(cli_invalid_args cli_invalid_args)
 add_ipk_test(client_timeout client_timeout)

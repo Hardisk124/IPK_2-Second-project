@@ -63,6 +63,7 @@ int main(int argc, char *argv[]){
             case 'c':
                 args.is_server = false;
                 mode_set = true;
+                args.is_client = true;
                 break;
             case 'p':
                 args.port = optarg;
@@ -103,6 +104,10 @@ int main(int argc, char *argv[]){
     }
     if (!args.is_server && args.address == NULL) {
         fprintf(stderr, "Error: Client mode requires an address.\n");
+        return 1;
+    }
+    if (args.is_server && args.is_client) {
+        fprintf(stderr, "Error: Cannot be both server and client.\n");
         return 1;
     }
     
