@@ -172,7 +172,7 @@ Meranie na localhoste (IPv4, bez impairmentov):
 - Čas prenosu: **0.7 s**
 - Priepustnosť: **~22.86 MiB/s**
 
-Meranie na localhoste (IPv4, bez impairmentov):
+Meranie na localhoste (IPv6, bez impairmentov):
 - Veľkosť dát: 16 MiB
 - Čas prenosu: **0.8 s**
 - Priepustnosť: **~20 MiB/s**
