@@ -153,6 +153,8 @@ ctest --test-dir build -R basic_file_transfer
 | --- | --- | --- | --- | --- | --- |
 | `basic_file_transfer` | prenos súboru → súbor | základná funkčnosť | klient+server na IPv4 | 64 KiB náhodných dát, výstup totožný | **PASS** (exit 0, obsah zhodný) |
 | `stdin_stdout_transfer` | `stdin` → `stdout` | podpora streamov | client stdin, server stdout | 8 KiB náhodných dát | **PASS** (exit 0, obsah zhodný) |
+| `test_stdin_to_file` | `stdin` → `súbor` | podpora streamov | client stdin, server stdout | 8 KiB náhodných dát | **PASS** (exit 0, obsah zhodný) |
+| `test_file_to_stdout` | `súbor` → `stdout` | podpora streamov | client stdin, server stdout | 8 KiB náhodných dát | **PASS** (exit 0, obsah zhodný) |
 | `empty_input_transfer` | prázdny vstup | edge-case | prenos 0 B | očakáva sa prázdny výstup | **PASS** |
 | `cli_invalid_args` | chybné argumenty | validácia CLI | spustenie bez povinných arg. | nenulový exit | **PASS** |
 | `client_timeout` | timeout bez servera | správne ukončenie | klient na neexistujúci port | nenulový exit po `-w 1` | **PASS** |
