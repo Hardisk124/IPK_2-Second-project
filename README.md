@@ -169,8 +169,13 @@ Poznámka: `netem_impairments` používa user-space proxy, ktorá:
 
 Meranie na localhoste (IPv4, bez impairmentov):
 - Veľkosť dát: 16 MiB
-- Čas prenosu: **0.2004 s**
-- Priepustnosť: **~79.83 MiB/s**
+- Čas prenosu: **0.7 s**
+- Priepustnosť: **~22.86 MiB/s**
+
+Meranie na localhoste (IPv4, bez impairmentov):
+- Veľkosť dát: 16 MiB
+- Čas prenosu: **0.8 s**
+- Priepustnosť: **~20 MiB/s**
 
 ## Známe obmedzenia
 - Žiadne congestion control a adaptívne RTT (fixné retransmit intervaly).
