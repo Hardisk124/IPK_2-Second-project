@@ -186,7 +186,10 @@ Meranie na localhoste (IPv6, bez impairmentov):
 - Bez šifrovania a autentizácie.
 
 ## Zdroje
-- RFC 768 (UDP)
-- RFC 793 / RFC 9293 (TCP)
-- RFC 6298 (RTO)
-- KUROSE, ROSS: Computer Networking: A Top-Down Approach
+- **RFC 768 – User Datagram Protocol** - https://datatracker.ietf.org/doc/html/rfc768
+
+- **RFC 793 – Transmission Control Protocol** – https://datatracker.ietf.org/doc/html/rfc793
+
+- **RFC 6298 (RTO)** - https://datatracker.ietf.org/doc/html/rfc6298
+
+- **KUROSE, James F. and ROSS, Keith W. Computer Networking: A Top-Down Approach. Pearson.**
